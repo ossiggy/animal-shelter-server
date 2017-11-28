@@ -1,12 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const {cats, dogs} = require('./data')
+const {cats, dogs} = require('./data');
 
 const {PORT, CLIENT_ORIGIN} = require('./config');
 const {dbConnect} = require('./db-mongoose');
 // const {dbConnect} = require('./db-knex');
-
+const catArr = [];
+const dogArr = [];
 
 const app = express();
 
@@ -22,24 +23,36 @@ app.use(
     })
 );
 
+function populateArray(array, data) {
+  // spread the data into an array
+  // so we can iterate regardless of whether
+  // the data is one animal or several animals.
+  data = [...data];
+
+  for (let i = 0; i < data.length; i++) {
+    array.push(data[i]);
+  }
+}
+
 app.get('/api/cat', (req, res) => {
-  res.json(cats[0]);
+  populateArray(catArr, cats)
+  console.log(catArr)
+  res.json(catArr[0]);
 })
 
 app.get('/api/dog', (req, res) => {
-  res.json(dogs[0]);
+  populateArray(dogArr, dogs)
+  res.json(dogArr[0]);
 })
 
 app.delete('/api/cat', (req,res) => {
-  cats.shift();
+  catArr.shift();
   res.sendStatus(200);
-  console.log(cats);
 })
 
 app.delete('/api/dog', (req,res) => {
-  dogs.shift();
+  dogArr.shift();
   res.sendStatus(200);
-  console.log(dogs)
 })
 
 function runServer(port = PORT) {
